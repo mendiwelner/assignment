@@ -1,10 +1,48 @@
 import { useEffect, useMemo, useState } from 'react';
+import {
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Container,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
 const API_BASE = '/api';
 const DEFAULT_PAGE_SIZE = 10;
 const AGGREGATION_PAGE_SIZE = 5;
 
-function App() {
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: { main: '#1565c0' },
+    background: { default: '#f4f6f8' },
+  },
+});
+
+const STATUS_COLOR = {
+  ok: 'success',
+  warning: 'warning',
+  fault: 'error',
+};
+
+function AppContent() {
   const [items, setItems] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, page_size: DEFAULT_PAGE_SIZE, total: 0, pages: 0 });
   const [aggregation, setAggregation] = useState([]);
@@ -110,160 +148,249 @@ function App() {
   };
 
   return (
-    <div className="app-shell">
-      <header className="hero">
-        <div>
-          <p className="eyebrow">Sensor Telemetry Explorer</p>
-          <h1>Inspect live telemetry with fast server-side filtering.</h1>
-        </div>
-        <div className="hero-badge">{pagination.total} readings</div>
-      </header>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4 }}>
+      <Container maxWidth="xl">
+        <Stack spacing={3}>
+          <Paper sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Box>
+              <Typography variant="overline" color="primary" fontWeight={700}>
+                Sensor Telemetry Explorer
+              </Typography>
+              <Typography variant="h5" component="h1" fontWeight={600}>
+                Inspect live telemetry with fast server-side filtering
+              </Typography>
+            </Box>
+            <Chip label={`${pagination.total.toLocaleString()} readings`} color="primary" variant="outlined" />
+          </Paper>
 
-      <section className="panel controls">
-        <div className="control-grid">
-          <label>
-            Asset ID
-            <input name="asset_id" value={filters.asset_id} onChange={handleFilterChange} placeholder="PS-042" />
-          </label>
-          <label>
-            Asset Type
-            <select name="asset_type" value={filters.asset_type} onChange={handleFilterChange}>
-              <option value="">All</option>
-              <option value="pump_station">Pump station</option>
-              <option value="borehole">Borehole</option>
-              <option value="reservoir">Reservoir</option>
-            </select>
-          </label>
-          <label>
-            Metric
-            <select name="metric" value={filters.metric} onChange={handleFilterChange}>
-              <option value="">All</option>
-              <option value="flow_rate">Flow rate</option>
-              <option value="pressure">Pressure</option>
-              <option value="energy_kwh">Energy</option>
-              <option value="water_level">Water level</option>
-            </select>
-          </label>
-          <label>
-            Status
-            <select name="status" value={filters.status} onChange={handleFilterChange}>
-              <option value="">All</option>
-              <option value="ok">Ok</option>
-              <option value="warning">Warning</option>
-              <option value="fault">Fault</option>
-            </select>
-          </label>
-          <label>
-            From
-            <input name="start_time" type="datetime-local" value={filters.start_time} onChange={handleFilterChange} />
-          </label>
-          <label>
-            To
-            <input name="end_time" type="datetime-local" value={filters.end_time} onChange={handleFilterChange} />
-          </label>
-        </div>
-        <div className="controls-actions">
-          <button type="button" onClick={resetFilters}>Reset</button>
-        </div>
-      </section>
+          <Paper sx={{ p: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={4} lg={2}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Asset ID"
+                  name="asset_id"
+                  value={filters.asset_id}
+                  onChange={handleFilterChange}
+                  placeholder="PS-042"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4} lg={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Asset Type</InputLabel>
+                  <Select name="asset_type" value={filters.asset_type} label="Asset Type" onChange={handleFilterChange}>
+                    <MenuItem value="">All</MenuItem>
+                    <MenuItem value="pump_station">Pump station</MenuItem>
+                    <MenuItem value="borehole">Borehole</MenuItem>
+                    <MenuItem value="reservoir">Reservoir</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4} lg={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Metric</InputLabel>
+                  <Select name="metric" value={filters.metric} label="Metric" onChange={handleFilterChange}>
+                    <MenuItem value="">All</MenuItem>
+                    <MenuItem value="flow_rate">Flow rate</MenuItem>
+                    <MenuItem value="pressure">Pressure</MenuItem>
+                    <MenuItem value="energy_kwh">Energy</MenuItem>
+                    <MenuItem value="water_level">Water level</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4} lg={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Status</InputLabel>
+                  <Select name="status" value={filters.status} label="Status" onChange={handleFilterChange}>
+                    <MenuItem value="">All</MenuItem>
+                    <MenuItem value="ok">Ok</MenuItem>
+                    <MenuItem value="warning">Warning</MenuItem>
+                    <MenuItem value="fault">Fault</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4} lg={2}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="From"
+                  name="start_time"
+                  type="datetime-local"
+                  value={filters.start_time}
+                  onChange={handleFilterChange}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4} lg={2}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="To"
+                  name="end_time"
+                  type="datetime-local"
+                  value={filters.end_time}
+                  onChange={handleFilterChange}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            </Grid>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button variant="outlined" onClick={resetFilters}>
+                Reset
+              </Button>
+            </Box>
+          </Paper>
 
-      <section className="layout-grid">
-        <div className="panel summary">
-          <div className="table-header">
-            <h2>Aggregation snapshot</h2>
-            <span>{aggregationPagination.pages} pages</span>
-          </div>
-          {loadingAggregation ? (
-            <p className="empty-state">Loading aggregation...</p>
-          ) : aggregation.length > 0 ? (
-            <>
-              <ul className="aggregate-list">
-                {aggregation.map((entry) => (
-                  <li key={`${entry.asset_id}-${entry.metric}`}>
-                    <div>
-                      <strong>{entry.asset_id}</strong>
-                      <span>{entry.metric}</span>
-                    </div>
-                    <div>
-                      <span>Avg {entry.average}</span>
-                      <span>Min {entry.minimum}</span>
-                      <span>Max {entry.maximum}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <div className="pagination">
-                <button
-                  type="button"
-                  onClick={() => setAggregationPage((current) => Math.max(1, current - 1))}
-                  disabled={aggregationPage === 1}
-                >
-                  Prev
-                </button>
-                <span>Page {aggregationPagination.page}</span>
-                <button
-                  type="button"
-                  onClick={() => setAggregationPage((current) => current + 1)}
-                  disabled={aggregationPage >= aggregationPagination.pages}
-                >
-                  Next
-                </button>
-              </div>
-            </>
-          ) : (
-            <p className="empty-state">No aggregation rows matched the active filters.</p>
-          )}
-        </div>
+          <Grid container spacing={3}>
+            <Grid item xs={12} lg={4}>
+              <Paper sx={{ p: 3, height: '100%' }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                  <Typography variant="h6">Aggregation snapshot</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {aggregationPagination.pages} pages
+                  </Typography>
+                </Stack>
 
-        <div className="panel table-panel">
-          <div className="table-header">
-            <h2>Readings</h2>
-            <span>{pagination.pages} pages</span>
-          </div>
+                {loadingAggregation ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+                    <CircularProgress size={32} />
+                  </Box>
+                ) : aggregation.length > 0 ? (
+                  <>
+                    <Stack spacing={1.5}>
+                      {aggregation.map((entry) => (
+                        <Paper key={`${entry.asset_id}-${entry.metric}`} variant="outlined" sx={{ p: 2 }}>
+                          <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
+                            <Box>
+                              <Typography fontWeight={700}>{entry.asset_id}</Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                {entry.metric}
+                              </Typography>
+                            </Box>
+                            <Stack direction="row" spacing={1} flexWrap="wrap">
+                              <Chip size="small" label={`Avg ${entry.average}`} />
+                              <Chip size="small" label={`Min ${entry.minimum}`} variant="outlined" />
+                              <Chip size="small" label={`Max ${entry.maximum}`} variant="outlined" />
+                            </Stack>
+                          </Stack>
+                        </Paper>
+                      ))}
+                    </Stack>
+                    <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} sx={{ mt: 2 }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => setAggregationPage((current) => Math.max(1, current - 1))}
+                        disabled={aggregationPage === 1}
+                      >
+                        Prev
+                      </Button>
+                      <Typography variant="body2">Page {aggregationPagination.page}</Typography>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => setAggregationPage((current) => current + 1)}
+                        disabled={aggregationPage >= aggregationPagination.pages}
+                      >
+                        Next
+                      </Button>
+                    </Stack>
+                  </>
+                ) : (
+                  <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                    No aggregation rows matched the active filters.
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
 
-          {loadingReadings ? (
-            <p className="empty-state">Loading telemetry...</p>
-          ) : items.length === 0 ? (
-            <p className="empty-state">Nothing matched these filters.</p>
-          ) : (
-            <>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Asset</th>
-                    <th>Metric</th>
-                    <th>Value</th>
-                    <th>Status</th>
-                    <th>Recorded</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.asset_id}</td>
-                      <td>{item.metric}</td>
-                      <td>{item.value} {item.unit}</td>
-                      <td>{item.status}</td>
-                      <td>{item.recorded_at}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <Grid item xs={12} lg={8}>
+              <Paper sx={{ p: 3 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                  <Typography variant="h6">Readings</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {pagination.pages} pages
+                  </Typography>
+                </Stack>
 
-              <div className="pagination">
-                <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1}>
-                  Prev
-                </button>
-                <span>Page {pagination.page}</span>
-                <button type="button" onClick={() => setPage((current) => current + 1)} disabled={page >= pagination.pages}>
-                  Next
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-    </div>
+                {loadingReadings ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                    <CircularProgress size={40} />
+                  </Box>
+                ) : items.length === 0 ? (
+                  <Typography color="text.secondary" sx={{ py: 8, textAlign: 'center' }}>
+                    Nothing matched these filters.
+                  </Typography>
+                ) : (
+                  <>
+                    <TableContainer>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Asset</TableCell>
+                            <TableCell>Metric</TableCell>
+                            <TableCell>Value</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Recorded</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {items.map((item) => (
+                            <TableRow key={item.id} hover>
+                              <TableCell>{item.asset_id}</TableCell>
+                              <TableCell>{item.metric}</TableCell>
+                              <TableCell>
+                                {item.value} {item.unit}
+                              </TableCell>
+                              <TableCell>
+                                <Chip
+                                  size="small"
+                                  label={item.status}
+                                  color={STATUS_COLOR[item.status] ?? 'default'}
+                                />
+                              </TableCell>
+                              <TableCell>{item.recorded_at}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+
+                    <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} sx={{ mt: 2 }}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => setPage((current) => Math.max(1, current - 1))}
+                        disabled={page === 1}
+                      >
+                        Prev
+                      </Button>
+                      <Typography variant="body2">Page {pagination.page}</Typography>
+                      <Button
+                        variant="outlined"
+                        onClick={() => setPage((current) => current + 1)}
+                        disabled={page >= pagination.pages}
+                      >
+                        Next
+                      </Button>
+                    </Stack>
+                  </>
+                )}
+              </Paper>
+            </Grid>
+          </Grid>
+        </Stack>
+      </Container>
+    </Box>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AppContent />
+    </ThemeProvider>
   );
 }
 
