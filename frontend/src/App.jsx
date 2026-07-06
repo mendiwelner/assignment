@@ -153,11 +153,11 @@ function AppContent() {
         <Stack spacing={3}>
           <Paper sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
             <Box>
-              <Typography variant="overline" color="primary" fontWeight={700}>
+              <Typography variant="h5" component="h1" fontWeight={600}>
                 Sensor Telemetry Explorer
               </Typography>
-              <Typography variant="h5" component="h1" fontWeight={600}>
-                Inspect live telemetry with fast server-side filtering
+              <Typography variant="overline" color="primary" fontWeight={700}>
+                Browse and filter sensor readings from water facilities
               </Typography>
             </Box>
             <Chip label={`${pagination.total.toLocaleString()} readings`} color="primary" variant="outlined" />
