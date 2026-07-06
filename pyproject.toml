@@ -1,0 +1,13 @@
+[tool.pyright]
+extraPaths = ["backend"]
+venvPath = "."
+venv = ".venv"
+
+[tool.pylint.main]
+init-hook = "import sys; sys.path.insert(0, 'backend')"
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint."messages control"]
+disable = ["missing-module-docstring", "missing-function-docstring"]
